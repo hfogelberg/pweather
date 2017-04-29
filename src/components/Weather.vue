@@ -1,15 +1,21 @@
 <template lang="html">
   <div class="weather">
     <h1>Weather app</h1>
-    <div class='location'>Lat: {{lat}}, Lng: {{lng}}</div>
-
-    <pre>{{current}}</pre>
+    <div class = 'weather-data'>
+      <div class='location'>Lat: {{lat}}, Lng: {{lng}}</div>
+      <hr>
+      <pre>{{current}}</pre>
+      <hr>
+      <pre>{{dailySummary}}</pre>
+      <hr>
+      <pre>{{dailyForecasts}}</pre>
+      <pre>{{hourlyForecasts}}</pre>
+    </div>
   </div>
 </template>
 
 <script>
 import axios from 'axios'
-// import { DARK_WEATHER_KEY } from '../../config.js'
 
 export default {
   data () {
@@ -25,7 +31,13 @@ export default {
           bearing: '',
           windspeed: 0,
           ozone: 0
-        }
+        },
+        dailySummary: {
+          text: '',
+          icon: ''
+        },
+        dailyForecasts: [],
+        hourlyForecasts: []
       }
   },
   mounted: function() {
@@ -40,25 +52,76 @@ export default {
 
   methods: {
     getWeather() {
-      console.log('getWeather');
-//https://api.darksky.net/forecast/dd7aee29471de7467a81eb91c6be98d9/28.4071789,-16.567483199999998?units=auto
-
-
-//https://localhost:8081/api/weather/28.4071789,-16.567483199999998
-
     let url = `http://localhost:8081/api/forecast/${this.lat},${this.lng}`
     axios.get(url)
             .then((res) => {
               const data = res.data.data
+              console.log(data);
               let current = data.currently
+              let hourly = data.hourly
+              let daily = data.daily
               this.parseCurrentWeatherData(current)
+              this.parseHourlyForecast(hourly)
+              this.parseDayForecast(daily)
             })
             .catch((err) => {
               console.log(err);
             })
     },
+    parseHourlyForecast(hourly) {
+      console.log('*** HOURLY ***' , hourly);
+      let hourlyData = hourly.data
+
+      for (let i = 0; i  < hourlyData.length; i++) {
+        if (i  % 3 === 0) {
+          let dataItem = hourlyData[i]
+          console.log('Hourly data item: ' + dataItem);
+          let hourlyItem = {
+            clour: dataItem.cloudCover * 100,
+            humidity: dataItem.humidity * 100,
+            icon: dataItem.icon,
+            ozone: dataItem.ozone,
+            precip: dataItem.precipIntensity,
+            preciProb: dataItem.precipProbability * 100,
+            pressure: dataItem.pressure,
+            summare: dataItem.summary,
+            temp: dataItem.temperature,
+            time: dataItem.time,
+            windBearing: dataItem.windBearing,
+            windspeed: dataItem.windSpeed
+          }
+
+          this.hourlyForecasts.push(hourlyItem)
+        }
+      }
+
+    },
+    parseDayForecast(daily) {
+      this.dailySummary = {
+        text: daily.summary,
+        icon: daily.icon
+      }
+
+      let forecasts = daily.data
+      console.log('Iterating Daily forecasts');
+      forecasts.map((forecast) => {
+        let item = {
+          date: forecast.time,
+          summary: forecast.summary,
+          maxTemp: forecast.apparentTemperatureMax,
+          minTemp: forecast.apparentTemperatureMin,
+          humidity: forecast.humidity * 100,
+          icon: forecast.icon,
+          windSpeed: forecast.windSpeed,
+          bearing: forecast.windBearing,
+          ozon: forecast.ozone,
+          moon: forecast.moonPhase * 100,
+          cloud: forecast.cloudCover * 100
+        }
+        this.dailyForecasts.push(item)
+      })
+    },
     parseCurrentWeatherData(current) {
-      console.log('Current weather', current);
       this.current = {
             summary: current.summary,
             temp: current.temperature,
@@ -69,10 +132,8 @@ export default {
             windspeed: current.windSpeed,
             ozone: current.ozone
           }
-
     },
     getCurrentLocation() {
-      console.log('getCurrentLocation');
       return new Promise((resolve, reject) =>{
         if ('geolocation' in navigator) {
           var gl = navigator.geolocation
@@ -91,5 +152,13 @@ export default {
 }
 </script>
 
-<style lang="css">
+<style lang="css" scoped>
+h1 {
+  text-align: center;
+}
+
+.weather-data {
+  margin-left: 40px;
+  margin-top: 20px;
+}
 </style>
