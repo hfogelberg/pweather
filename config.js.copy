@@ -1,0 +1,9 @@
+const IS_LOCAL = process.env.NODE_ENV !== 'production';
+const DARK_WEATHER_KEY = 'API_KEY';
+const API_ROOT_URL = IS_LOCAL
+    ? 'DEV_ROOT
+    : 'PROD_ROOT'
+
+module.exports = {
+  IS_LOCAL,
+  API_ROOT_URL
