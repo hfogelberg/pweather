@@ -2,55 +2,19 @@
   <div class="weather">
     <h1>Weather app</h1>
     <div class = 'weather-data'>
-      <div class='location'>Lat: {{lat}}, Lng: {{lng}}</div>
-      <hr>
-      <div class="summary">
-        <div class='summary-head'>{{dailySummary.text}}</div>
+      <div class='location' v-if = "hasLocationName">
+        Lat: {{lat}}, Lng: {{lng}}
       </div>
-      <div class='current'>
-        <h2>Now</h2>
-        <div class='today-text'>{{current.summary}}</div>
-        <div class="temp">Temperature {{current.temp}}</div>
-        <div class="humidity">Humidity {{current.humidity}} %</div>
-        <div class="pressure">Air pressure {{current.pressure}}</div>
-        <div class="wind">Wind {{current.bearing}} &deg; / {{current.windspeed}} m/s</div>
-      </div>
-
-      <hr>
-
-      <div class = 'hourly'>
-        <h2>The next hours</h2>
-        <ul>
-          <li v-for="hour in hourlyForecasts">
-            <h3 class="time">{{hour.time}}</h3>
-            <div class='summary'>{{hour.summary}}</div>
-            <div class="temp">Temperature {{hour.temp}} &deg;C</div>
-            <div class="humidity">Humidity {{hour.humidity}} %</div>
-            <div class="precip">Precimitation {{hour.precip}} mm (probability {{hour.preciProb}} %)</div>
-            <div class="wind">Wind {{hour.windBearing }} &deg; {{hour.windspeed}} m/s</div>
-          </li>
-        </ul>
-      </div>
-
-      <hr>
-
-      <div class='daily'>
-        <h2>This week</h2>
-        <ul>
-          <li v-for='daily in dailyForecasts' class='daily-forecast'>
-            <h3>{{daily.date}}</h3>
-            <div class="summary">{{daily.summary}}</div>
-            <div class='temp'>Temperature {{daily.minTemp}} - {{daily.maxTemp}} &deg; C</div>
-            <div class="humidity">Humidity {{daily.humidity}} %</div>
-            <div class="wind">Wind {{daily.bearing}} &deg; / {{daily.windspeed}} m/s</div>
-            <div class='clouds'>Cloudines {{daily.cloud}} %</div>
-            <div class='sunrise'>Sunrise {{daily.sunrise}}</div>
-            <div class='sunset'>Sunset {{daily.sunset}}</div>
-            <div class='moon'> Moon phase {{daily.moonPhase}} % </div>
-          </li>
-        </ul>
+      <div class = "locationSpinner">
+        <h2>Checking where you are ... </h2>
       </div>
       <hr>
+      <div class = "forecast" v-if = "hasForecast">
+        <summary :summaryText = "dailySummary"></summary>
+        <current-weather :current="current"></current-weather>
+        <hour-forecast :hourlyForecasts = "hourlyForecasts"></hour-forecast>
+        <days-forecast :dailyForecasts = "dailyForecasts"></days-forecast>
+      </div>        <!-- End forecast -->
     </div>
   </div>
 </template>
@@ -58,12 +22,24 @@
 <script>
 import axios from 'axios'
 import moment from 'moment'
+import Summary from './Summary.vue'
+import CurrentWeather from './CurrentWeather.vue'
+import DaysForecast from './DaysForecast.vue'
+import HoursForecast from './HoursForecast.vue'
 
 export default {
+  components: {
+    'summary': Summary,
+    'current-weather': CurrentWeather,
+    'hour-forecast': HoursForecast,
+    'days-forecast': DaysForecast
+  },
   data () {
       return {
         lat: 0.0,
         lng: 0.0,
+        hasLocationName: true,
+        hasForecast: true,
         current: {
           summary: '',
           temp: 0,
