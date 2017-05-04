@@ -1,22 +1,37 @@
 <template lang="html">
   <div class="weather">
-    <h1>Weather app</h1>
-    <div class = 'weather-data'>
-      <div class='location' v-if = "hasLocationName">
-        Lat: {{lat}}, Lng: {{lng}}
+    <h1>Weather App</h1>
+
+    <div class='location' v-if = "hasLocationName">
+      Lat: {{lat}}, Lng: {{lng}}
+    </div>
+    <div class = "locationSpinner">
+      <h2>Checking where you are ... </h2>
+    </div>
+
+    <div class="tabs-container">
+      <input class="state" type="radio" title="tab-one" name="tabs-state" id="tab-one" checked />
+      <input class="state" type="radio" title="tab-two" name="tabs-state" id="tab-two" />
+      <input class="state" type="radio" title="tab-three" name="tabs-state" id="tab-three" />
+
+      <div class="tabs flex-tabs">
+        <label for="tab-one" id="tab-one-label" class="tab">Daily Summary</label>
+        <label for="tab-two" id="tab-two-label" class="tab">The next hours</label>
+        <label for="tab-three" id="tab-three-label" class="tab">The next days</label>
+
+        <div id="tab-one-panel" class="panel active">
+          <now :summaryText = "dailySummary"></now>
+        </div>
+        <div id="tab-two-panel" class="panel">
+          <hour-forecast :hourlyForecasts = "hourlyForecasts"></hour-forecast>
+        </div>
+        <div id="tab-three-panel" class="panel">
+          <days-forecast :dailyForecasts = "dailyForecasts"></days-forecast>
+        </div>
       </div>
-      <div class = "locationSpinner">
-        <h2>Checking where you are ... </h2>
-      </div>
-      <hr>
-      <div class = "forecast" v-if = "hasForecast">
-        <summary :summaryText = "dailySummary"></summary>
-        <current-weather :current="current"></current-weather>
-        <hour-forecast :hourlyForecasts = "hourlyForecasts"></hour-forecast>
-        <days-forecast :dailyForecasts = "dailyForecasts"></days-forecast>
-      </div>        <!-- End forecast -->
     </div>
   </div>
+
 </template>
 
 <script>
@@ -29,13 +44,14 @@ import HoursForecast from './HoursForecast.vue'
 
 export default {
   components: {
-    'summary': Summary,
+    'now': Summary,
     'current-weather': CurrentWeather,
     'hour-forecast': HoursForecast,
     'days-forecast': DaysForecast
   },
   data () {
       return {
+        station: '',
         lat: 0.0,
         lng: 0.0,
         hasLocationName: true,
@@ -66,7 +82,7 @@ export default {
     .catch((err)=>{
       alert(err)
     })
-},
+  },
 
   methods: {
     getWeather() {
@@ -122,7 +138,7 @@ export default {
 
       let forecasts = daily.data
       console.log('Iterating Daily forecasts');
-      // TODO remove first item
+
       forecasts.map((forecast) => {
         let item = {
           date: moment.unix(forecast.time).format('ddd Do'),
@@ -154,21 +170,51 @@ export default {
             ozone: Math.round(current.ozone)
           }
     },
+
     getCurrentLocation() {
       return new Promise((resolve, reject) =>{
         if ('geolocation' in navigator) {
-          var gl = navigator.geolocation
-          gl.getCurrentPosition(function(position) {
-            console.log(position);
-            this.lng = position.coords.longitude
-            this.lat = position.coords.latitude
-          resolve();
-          }.bind(this))
-        } else {
-          reject('Cannot use geolocation')
+            var gl = navigator.geolocation
+            gl.getCurrentPosition(function(position) {
+              var geocoder = new google.maps.Geocoder();
+              this.lng = position.coords.longitude
+              this.lat = position.coords.latitude
+              var pos = new google.maps.LatLng(this.lat, this.lng);
+              geocoder.geocode({'latLng': pos}, function(results, status) {
+                  if (status === google.maps.GeocoderStatus.OK) {
+                    let station = '';
+                    if (results[0].address_components) {
+                      results[0].address_components.forEach((component)=>{
+                        let componentType = component.types[0].trim()
+                        console.log(componentType);
+                        if (componentType === 'postal_town') {
+                          console.log('1');
+                          station = component.long_name;
+                        }
+                        if ((componentType === 'locality') && (station==='')) {
+                          console.log('2');
+                          station = component.long_name;
+                        }
+                        if((componentType === 'administrative_area_level_1') && (station==='')) {
+                          console.log('3');
+                          station = component.long_name
+                        }
+                        if((componentType ===  'administrative_area_level_2') && (station==='')) {
+                          console.log('4');
+                          station = component.long_name
+                        }
+                      })
+                      this.station = station;
+                      hasLocationName: true;
+                    }
+                  }
+                })
+            }.bind(this))
+          } else {
+            reject('Cannot use geolocation')
         }
       })
-    },
+    }
   }
 }
 </script>
@@ -191,4 +237,166 @@ li {
   padding: 10px 20px 0 10px;
   border-radius: 2px solid black;
 }
+
+/*Flexcordion*/
+/* Android 2.3 :checked fix */
+@-webkit-keyframes fake {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes fake {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 1;
+  }
+}
+body {
+  -webkit-animation: fake 1s infinite;
+          animation: fake 1s infinite;
+}
+
+.tabs-container {
+  margin: 20px;
+  width: 80%;
+}
+
+.tabs-container .state {
+  position: absolute;
+  left: -10000px;
+}
+
+.tabs-container .flex-tabs {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
+}
+
+.tabs-container .flex-tabs .tab {
+  -webkit-box-flex: 1;
+      -ms-flex-positive: 1;
+          flex-grow: 1;
+  max-height: 40px;
+}
+
+.tabs-container .flex-tabs .panel {
+  background-color: #fff;
+  padding: 20px;
+  min-height: 300px;
+  display: none;
+  width: 100%;
+  -ms-flex-preferred-size: auto;
+      flex-basis: auto;
+}
+
+.tabs-container .tab {
+  display: inline-block;
+  padding: 10px;
+  vertical-align: top;
+  background-color: #eee;
+  cursor: hand;
+  cursor: pointer;
+  border-left: 10px solid #ccc;
+}
+
+.tabs-container .tab:hover {
+  background-color: #fff;
+}
+
+#tab-one:checked ~ .tabs #tab-one-label,
+#tab-two:checked ~ .tabs #tab-two-label,
+#tab-three:checked ~ .tabs #tab-three-label,
+#tab-four:checked ~ .tabs #tab-four-label {
+  background-color: #fff;
+  cursor: default;
+  border-left-color: #69be28;
+}
+
+#tab-one:checked ~ .tabs #tab-one-panel,
+#tab-two:checked ~ .tabs #tab-two-panel,
+#tab-three:checked ~ .tabs #tab-three-panel,
+#tab-four:checked ~ .tabs #tab-four-panel {
+  display: block;
+}
+
+@media (max-width: 600px) {
+  .flex-tabs {
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+            flex-direction: column;
+  }
+  .flex-tabs .tab {
+    background: #fff;
+    border-bottom: 1px solid #ccc;
+  }
+  .flex-tabs .tab:last-of-type {
+    border-bottom: none;
+  }
+  .flex-tabs #tab-one-label {
+    -webkit-box-ordinal-group: 2;
+        -ms-flex-order: 1;
+            order: 1;
+  }
+  .flex-tabs #tab-two-label {
+    -webkit-box-ordinal-group: 4;
+        -ms-flex-order: 3;
+            order: 3;
+  }
+  .flex-tabs #tab-three-label {
+    -webkit-box-ordinal-group: 6;
+        -ms-flex-order: 5;
+            order: 5;
+  }
+  .flex-tabs #tab-four-label {
+    -webkit-box-ordinal-group: 8;
+        -ms-flex-order: 7;
+            order: 7;
+  }
+  .flex-tabs #tab-one-panel {
+    -webkit-box-ordinal-group: 3;
+        -ms-flex-order: 2;
+            order: 2;
+  }
+  .flex-tabs #tab-two-panel {
+    -webkit-box-ordinal-group: 5;
+        -ms-flex-order: 4;
+            order: 4;
+  }
+  .flex-tabs #tab-three-panel {
+    -webkit-box-ordinal-group: 7;
+        -ms-flex-order: 6;
+            order: 6;
+  }
+  .flex-tabs #tab-four-panel {
+    -webkit-box-ordinal-group: 9;
+        -ms-flex-order: 8;
+            order: 8;
+  }
+
+  #tab-one:checked ~ .tabs #tab-one-label,
+  #tab-two:checked ~ .tabs #tab-two-label,
+  #tab-three:checked ~ .tabs #tab-three-label,
+  #tab-four:checked ~ .tabs #tab-four-label {
+    border-bottom: none;
+  }
+
+  #tab-one:checked ~ .tabs #tab-one-panel,
+  #tab-two:checked ~ .tabs #tab-two-panel,
+  #tab-three:checked ~ .tabs #tab-three-panel,
+  #tab-four:checked ~ .tabs #tab-four-panel {
+    border-bottom: 1px solid #ccc;
+  }
+}
+
 </style>
