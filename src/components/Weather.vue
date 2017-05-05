@@ -14,7 +14,7 @@
       <now :summary = "dailySummary"></now>
     </div>
 
-    <div class="tabs-container">
+    <div class="tabs-container" v-if="hasForecast">
       <input class="state" type="radio" title="tab-one" name="tabs-state" id="tab-one" checked />
       <input class="state" type="radio" title="tab-two" name="tabs-state" id="tab-two" />
       <input class="state" type="radio" title="tab-three" name="tabs-state" id="tab-three" />
@@ -35,6 +35,11 @@
         </div>
       </div>
     </div>
+
+    <div v-else>
+      <div>Fetching forecast ... </div>
+    </div>
+
   </div>
 
 </template>
@@ -59,8 +64,8 @@ export default {
         station: '',
         lat: 0.0,
         lng: 0.0,
-        hasLocationName: true,
-        hasForecast: true,
+        hasLocationName: false,
+        hasForecast: false,
         current: {
           summary: '',
           temp: 0,
@@ -83,7 +88,7 @@ export default {
   this.getCurrentLocation()
     .then(()=>{
       this.getWeather()
-      //this.reverseGeocode()
+      this.reverseGeocode()
     })
     .catch((err)=>{
       alert(err)
@@ -96,6 +101,7 @@ export default {
       console.log(url)
       axios.get(url)
             .then((res) => {
+              this.hasForecast = true
               const data = res.data.data
               console.log(data);
               let current = data.currently
@@ -119,29 +125,26 @@ export default {
               if (results[0].address_components) {
                 results[0].address_components.forEach((component)=>{
                   let componentType = component.types[0].trim()
-                  console.log(componentType);
                   if (componentType === 'postal_town') {
-                    console.log('1');
-                    station = component.long_name;
+                    this.station = component.long_name;
+                    this.hasLocationName = true;
                   }
-                  if ((componentType === 'locality') && (station==='')) {
-                    console.log('2');
-                    station = component.long_name;
+                  if ((componentType === 'locality') && (this.station==='')) {
+                    this.station = component.long_name;
+                    this.hasLocationName = true;
                   }
-                  if((componentType === 'administrative_area_level_1') && (station==='')) {
-                    console.log('3');
-                    station = component.long_name
+                  if((componentType === 'administrative_area_level_1') && (this.station==='')) {
+                    this.station = component.long_name
+                    this.hasLocationName = true;
                   }
-                  if((componentType ===  'administrative_area_level_2') && (station==='')) {
-                    console.log('4');
-                    station = component.long_name
+                  if((componentType ===  'administrative_area_level_2') && (this.station==='')) {
+                    this.station = component.long_name
+                    this.hasLocationName = true;
                   }
                 })
-                this.station = station;
-                hasLocationName: true;
               }
             }
-          })
+          }.bind(this))
       },
 
     parseHourlyForecast(hourly) {
