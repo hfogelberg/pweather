@@ -1,13 +1,13 @@
 <template lang="html">
   <div class="summary">
     <h2>Summary</h2>
-    <div class='summary-head'>{{summaryText}}</div>
+    <div class='summary-head'>{{summary.text}}</div>
   </div>
 </template>
 
 <script>
 export default {
-  props: ['summaryText']
+  props: ['summary']
 }
 </script>
 

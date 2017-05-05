@@ -3,10 +3,15 @@
     <h1>Weather App</h1>
 
     <div class='location' v-if = "hasLocationName">
-      Lat: {{lat}}, Lng: {{lng}}
+      <div class="locationName">{{station}}</div>
+      <div class="coords">(Lat: {{lat}}, Lng: {{lng}})</div>
     </div>
-    <div class = "locationSpinner">
+    <div class = "locationSpinner" v-else>
       <h2>Checking where you are ... </h2>
+    </div>
+
+    <div v-if="hasForecast">
+      <now :summary = "dailySummary"></now>
     </div>
 
     <div class="tabs-container">
@@ -15,12 +20,12 @@
       <input class="state" type="radio" title="tab-three" name="tabs-state" id="tab-three" />
 
       <div class="tabs flex-tabs">
-        <label for="tab-one" id="tab-one-label" class="tab">Daily Summary</label>
+        <label for="tab-one" id="tab-one-label" class="tab">Today</label>
         <label for="tab-two" id="tab-two-label" class="tab">The next hours</label>
         <label for="tab-three" id="tab-three-label" class="tab">The next days</label>
 
         <div id="tab-one-panel" class="panel active">
-          <now :summaryText = "dailySummary"></now>
+          <current-weather :current="current"></current-weather>
         </div>
         <div id="tab-two-panel" class="panel">
           <hour-forecast :hourlyForecasts = "hourlyForecasts"></hour-forecast>
@@ -78,6 +83,7 @@ export default {
   this.getCurrentLocation()
     .then(()=>{
       this.getWeather()
+      //this.reverseGeocode()
     })
     .catch((err)=>{
       alert(err)
@@ -86,8 +92,9 @@ export default {
 
   methods: {
     getWeather() {
-    let url = `http://localhost:8081/api/forecast/${this.lat},${this.lng}`
-    axios.get(url)
+      let url = `http://localhost:8081/api/forecast/${this.lat},${this.lng}`
+      console.log(url)
+      axios.get(url)
             .then((res) => {
               const data = res.data.data
               console.log(data);
@@ -101,7 +108,42 @@ export default {
             .catch((err) => {
               console.log(err);
             })
-    },
+      },
+
+      reverseGeocode() {
+        var geocoder = new google.maps.Geocoder();
+        var pos = new google.maps.LatLng(this.lat, this.lng);
+        geocoder.geocode({'latLng': pos}, function(results, status) {
+            if (status === google.maps.GeocoderStatus.OK) {
+              let station = '';
+              if (results[0].address_components) {
+                results[0].address_components.forEach((component)=>{
+                  let componentType = component.types[0].trim()
+                  console.log(componentType);
+                  if (componentType === 'postal_town') {
+                    console.log('1');
+                    station = component.long_name;
+                  }
+                  if ((componentType === 'locality') && (station==='')) {
+                    console.log('2');
+                    station = component.long_name;
+                  }
+                  if((componentType === 'administrative_area_level_1') && (station==='')) {
+                    console.log('3');
+                    station = component.long_name
+                  }
+                  if((componentType ===  'administrative_area_level_2') && (station==='')) {
+                    console.log('4');
+                    station = component.long_name
+                  }
+                })
+                this.station = station;
+                hasLocationName: true;
+              }
+            }
+          })
+      },
+
     parseHourlyForecast(hourly) {
       console.log('*** HOURLY ***' , hourly);
       let hourlyData = hourly.data
@@ -135,6 +177,8 @@ export default {
         text: daily.summary,
         icon: daily.icon
       }
+
+      console.log('dailySummary: ' + this.dailySummary)
 
       let forecasts = daily.data
       console.log('Iterating Daily forecasts');
@@ -176,39 +220,9 @@ export default {
         if ('geolocation' in navigator) {
             var gl = navigator.geolocation
             gl.getCurrentPosition(function(position) {
-              var geocoder = new google.maps.Geocoder();
               this.lng = position.coords.longitude
               this.lat = position.coords.latitude
-              var pos = new google.maps.LatLng(this.lat, this.lng);
-              geocoder.geocode({'latLng': pos}, function(results, status) {
-                  if (status === google.maps.GeocoderStatus.OK) {
-                    let station = '';
-                    if (results[0].address_components) {
-                      results[0].address_components.forEach((component)=>{
-                        let componentType = component.types[0].trim()
-                        console.log(componentType);
-                        if (componentType === 'postal_town') {
-                          console.log('1');
-                          station = component.long_name;
-                        }
-                        if ((componentType === 'locality') && (station==='')) {
-                          console.log('2');
-                          station = component.long_name;
-                        }
-                        if((componentType === 'administrative_area_level_1') && (station==='')) {
-                          console.log('3');
-                          station = component.long_name
-                        }
-                        if((componentType ===  'administrative_area_level_2') && (station==='')) {
-                          console.log('4');
-                          station = component.long_name
-                        }
-                      })
-                      this.station = station;
-                      hasLocationName: true;
-                    }
-                  }
-                })
+              resolve()
             }.bind(this))
           } else {
             reject('Cannot use geolocation')
