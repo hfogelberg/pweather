@@ -23,5 +23,8 @@ export default {
 }
 </script>
 
-<style lang="css">
+<style lang="css" scoped>
+ul {
+  list-style: none;
+}
 </style>
