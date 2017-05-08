@@ -2,13 +2,7 @@
   <div class="weather">
     <h1>Weather App</h1>
 
-    <div class='location' v-if = "hasLocationName">
-      <div class="locationName">{{station}}</div>
-      <div class="coords">(Lat: {{lat}}, Lng: {{lng}})</div>
-    </div>
-    <div class = "locationSpinner" v-else>
-      <h2>Checking where you are ... </h2>
-    </div>
+    <location :location="location"></location>
 
     <div v-if="hasForecast">
       <now :summary = "dailySummary"></now>
@@ -51,21 +45,29 @@ import Summary from './Summary.vue'
 import CurrentWeather from './CurrentWeather.vue'
 import DaysForecast from './DaysForecast.vue'
 import HoursForecast from './HoursForecast.vue'
+import Location from './Location.vue'
 
 export default {
   components: {
     'now': Summary,
     'current-weather': CurrentWeather,
     'hour-forecast': HoursForecast,
-    'days-forecast': DaysForecast
+    'days-forecast': DaysForecast,
+    'location': Location
   },
   data () {
       return {
-        station: '',
-        lat: 0.0,
-        lng: 0.0,
-        hasLocationName: false,
+        // station: '',
+        // lat: 0.0,
+        // lng: 0.0,
+        // hasLocationName: false,
         hasForecast: false,
+        location: {
+          station: '',
+          lat: 0.0,
+          lng: 0.0,
+          hasLocationName: false
+        },
         current: {
           summary: '',
           temp: 0,
@@ -97,7 +99,7 @@ export default {
 
   methods: {
     getWeather() {
-      let url = `http://localhost:8081/api/forecast/${this.lat},${this.lng}`
+      let url = `http://localhost:8081/api/forecast/${this.location.lat},${this.location.lng}`
       console.log(url)
       axios.get(url)
             .then((res) => {
@@ -118,7 +120,7 @@ export default {
 
       reverseGeocode() {
         var geocoder = new google.maps.Geocoder();
-        var pos = new google.maps.LatLng(this.lat, this.lng);
+        var pos = new google.maps.LatLng(this.location.lat, this.location.lng);
         geocoder.geocode({'latLng': pos}, function(results, status) {
             if (status === google.maps.GeocoderStatus.OK) {
               let station = '';
@@ -126,20 +128,20 @@ export default {
                 results[0].address_components.forEach((component)=>{
                   let componentType = component.types[0].trim()
                   if (componentType === 'postal_town') {
-                    this.station = component.long_name;
-                    this.hasLocationName = true;
+                    this.location.station = component.long_name;
+                    this.location.hasLocationName = true;
                   }
-                  if ((componentType === 'locality') && (this.station==='')) {
-                    this.station = component.long_name;
-                    this.hasLocationName = true;
+                  if ((componentType === 'locality') && (this.location.station==='')) {
+                    this.location.station = component.long_name;
+                    this.location.hasLocationName = true;
                   }
-                  if((componentType === 'administrative_area_level_1') && (this.station==='')) {
+                  if((componentType === 'administrative_area_level_1') && (this.location.station==='')) {
                     this.station = component.long_name
                     this.hasLocationName = true;
                   }
-                  if((componentType ===  'administrative_area_level_2') && (this.station==='')) {
-                    this.station = component.long_name
-                    this.hasLocationName = true;
+                  if((componentType ===  'administrative_area_level_2') && (this.location.station==='')) {
+                    this.location.station = component.long_name
+                    this.location.hasLocationName = true;
                   }
                 })
               }
@@ -148,7 +150,6 @@ export default {
       },
 
     parseHourlyForecast(hourly) {
-      console.log('*** HOURLY ***' , hourly);
       let hourlyData = hourly.data
 
       for (let i = 0; i  < hourlyData.length; i++) {
@@ -223,8 +224,8 @@ export default {
         if ('geolocation' in navigator) {
             var gl = navigator.geolocation
             gl.getCurrentPosition(function(position) {
-              this.lng = position.coords.longitude
-              this.lat = position.coords.latitude
+              this.location.lng = position.coords.longitude
+              this.location.lat = position.coords.latitude
               resolve()
             }.bind(this))
           } else {
@@ -236,10 +237,9 @@ export default {
 }
 </script>
 
-<style lang="css" scoped>
-h1 {
-  text-align: center;
-}
+<style lang="scss" scoped>
+@import '../assets/styles/fonts';
+@import '../assets/styles/flexcordion';
 
 .weather-data {
   margin-left: 40px;
@@ -253,167 +253,6 @@ ul {
 li {
   padding: 10px 20px 0 10px;
   border-radius: 2px solid black;
-}
-
-/*Flexcordion*/
-/* Android 2.3 :checked fix */
-@-webkit-keyframes fake {
-  from {
-    opacity: 1;
-  }
-  to {
-    opacity: 1;
-  }
-}
-@keyframes fake {
-  from {
-    opacity: 1;
-  }
-  to {
-    opacity: 1;
-  }
-}
-body {
-  -webkit-animation: fake 1s infinite;
-          animation: fake 1s infinite;
-}
-
-.tabs-container {
-  margin: 20px;
-  width: 80%;
-}
-
-.tabs-container .state {
-  position: absolute;
-  left: -10000px;
-}
-
-.tabs-container .flex-tabs {
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-pack: justify;
-      -ms-flex-pack: justify;
-          justify-content: space-between;
-  -ms-flex-wrap: wrap;
-      flex-wrap: wrap;
-}
-
-.tabs-container .flex-tabs .tab {
-  -webkit-box-flex: 1;
-      -ms-flex-positive: 1;
-          flex-grow: 1;
-  max-height: 40px;
-}
-
-.tabs-container .flex-tabs .panel {
-  background-color: #fff;
-  padding: 20px;
-  min-height: 300px;
-  display: none;
-  width: 100%;
-  -ms-flex-preferred-size: auto;
-      flex-basis: auto;
-}
-
-.tabs-container .tab {
-  display: inline-block;
-  padding: 10px;
-  vertical-align: top;
-  background-color: #eee;
-  cursor: hand;
-  cursor: pointer;
-  border-left: 10px solid #ccc;
-}
-
-.tabs-container .tab:hover {
-  background-color: #fff;
-}
-
-#tab-one:checked ~ .tabs #tab-one-label,
-#tab-two:checked ~ .tabs #tab-two-label,
-#tab-three:checked ~ .tabs #tab-three-label,
-#tab-four:checked ~ .tabs #tab-four-label {
-  background-color: #fff;
-  cursor: default;
-  border-left-color: #69be28;
-}
-
-#tab-one:checked ~ .tabs #tab-one-panel,
-#tab-two:checked ~ .tabs #tab-two-panel,
-#tab-three:checked ~ .tabs #tab-three-panel,
-#tab-four:checked ~ .tabs #tab-four-panel {
-  display: block;
-}
-
-@media (max-width: 600px) {
-  .flex-tabs {
-    -webkit-box-orient: vertical;
-    -webkit-box-direction: normal;
-        -ms-flex-direction: column;
-            flex-direction: column;
-  }
-  .flex-tabs .tab {
-    background: #fff;
-    border-bottom: 1px solid #ccc;
-  }
-  .flex-tabs .tab:last-of-type {
-    border-bottom: none;
-  }
-  .flex-tabs #tab-one-label {
-    -webkit-box-ordinal-group: 2;
-        -ms-flex-order: 1;
-            order: 1;
-  }
-  .flex-tabs #tab-two-label {
-    -webkit-box-ordinal-group: 4;
-        -ms-flex-order: 3;
-            order: 3;
-  }
-  .flex-tabs #tab-three-label {
-    -webkit-box-ordinal-group: 6;
-        -ms-flex-order: 5;
-            order: 5;
-  }
-  .flex-tabs #tab-four-label {
-    -webkit-box-ordinal-group: 8;
-        -ms-flex-order: 7;
-            order: 7;
-  }
-  .flex-tabs #tab-one-panel {
-    -webkit-box-ordinal-group: 3;
-        -ms-flex-order: 2;
-            order: 2;
-  }
-  .flex-tabs #tab-two-panel {
-    -webkit-box-ordinal-group: 5;
-        -ms-flex-order: 4;
-            order: 4;
-  }
-  .flex-tabs #tab-three-panel {
-    -webkit-box-ordinal-group: 7;
-        -ms-flex-order: 6;
-            order: 6;
-  }
-  .flex-tabs #tab-four-panel {
-    -webkit-box-ordinal-group: 9;
-        -ms-flex-order: 8;
-            order: 8;
-  }
-
-  #tab-one:checked ~ .tabs #tab-one-label,
-  #tab-two:checked ~ .tabs #tab-two-label,
-  #tab-three:checked ~ .tabs #tab-three-label,
-  #tab-four:checked ~ .tabs #tab-four-label {
-    border-bottom: none;
-  }
-
-  #tab-one:checked ~ .tabs #tab-one-panel,
-  #tab-two:checked ~ .tabs #tab-two-panel,
-  #tab-three:checked ~ .tabs #tab-three-panel,
-  #tab-four:checked ~ .tabs #tab-four-panel {
-    border-bottom: 1px solid #ccc;
-  }
 }
 
 </style>

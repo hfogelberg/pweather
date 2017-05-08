@@ -10,8 +10,13 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss">
+@import '/assets/styles/reset';
+@import '/assets/styles/master';
+
 #app {
   margin-top: 20px;
 }
+
+
 </style>
