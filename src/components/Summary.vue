@@ -13,7 +13,6 @@ export default {
 
 <style lang="scss" scoped>
   @import '../assets/styles/fonts';
-  @import '../assets/styles/fonts';
 
   .summary {
     border: 4px solid $border-color;
