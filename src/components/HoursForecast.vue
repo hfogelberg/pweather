@@ -1,26 +1,25 @@
 <template lang="html">
   <div class = 'hourly'>
-    <h2>The next hours</h2>
     <ul>
       <li v-for="hour in hourlyForecasts">
-        <h3 class="time">{{hour.time}}</h3>
-        <div class='summary'>{{hour.summary}}</div>
-        <div class="temp">Temperature {{hour.temp}} &deg;C</div>
-        <div class="humidity">Humidity {{hour.humidity}} %</div>
-        <div class="precip">Precimitation {{hour.precip}} mm (probability {{hour.preciProb}} %)</div>
-        <div class="wind">Wind {{hour.windBearing }} &deg; {{hour.windspeed}} m/s</div>
+        <hour :hour='hour'></hour>
       </li>
     </ul>
   </div>
 </template>
 
 <script>
+import Hour from './Hour.vue'
+
 export default {
-  props: ['hourlyForecasts']
+  props: ['hourlyForecasts'],
+  components: {
+    'hour': Hour
+  }
 }
 </script>
 
-<style lang="css" scoped>
+<style lang="scss" scoped>
 ul {
   list-style: none;
 }

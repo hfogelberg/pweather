@@ -8,7 +8,7 @@
         </div>
 
         <div class="center">
-          <label>{{daily.summary}}</label>
+          <label>{{daily.summary}}</label><br>
             <label class='temp'>Temperature {{daily.minTemp}} - {{daily.maxTemp}} &deg; C
             </label>
           </div>
@@ -33,42 +33,5 @@ export default {
 
 <style lang="scss" scoped>
 @import '../assets/styles/fonts';
-
-  .day {
-    padding: 1em;
-  }
-
-  h3 {
-    text-align: center;
-  }
-
-  .container {
-    display: flex;
-    flex-direction: row;
-    align-content: stretch;
-    justify-content: space-around;
-    align-items: center;
-    height: 100%;
-  }
-
-  .img-container {
-    width: 20vw;
-  }
-
-  .center {
-    width:  40vw;
-    padding-left: 1em;
-    padding-right: 1em;
-    label{
-      font-size: 1em;
-      font-weight: 400;
-    }
-  }
-
-  .right {
-    width: 40vw;
-    label {
-      font-size: 0.8em;
-    }
-  }
+@import '../assets/styles/panel-content';
 </style>
