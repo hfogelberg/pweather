@@ -1,11 +1,23 @@
 <template lang="html">
-  <div class='current'>
-    <h2>Now</h2>
-    <div class='today-text'>{{current.summary}}</div>
-    <div class="temp">Temperature {{current.temp}}</div>
-    <div class="humidity">Humidity {{current.humidity}} %</div>
-    <div class="pressure">Air pressure {{current.pressure}}</div>
-    <div class="wind">Wind {{current.bearing}} &deg; / {{current.windspeed}} m/s</div>
+  <div class='current-container'>
+    <div class='current'>
+      <img src="../assets/img/sun.svg">
+      <div class='description'>
+        <h3>{{current.summary}}</h3>
+        <div class="temp">
+          Temperature {{current.temp}}
+        </div>
+        <div class="humidity">
+          Humidity {{current.humidity}} %
+        </div>
+        <div class="pressure">
+          Air pressure {{current.pressure}}
+        </div>
+        <div class="wind">
+          Wind {{current.bearing}} &deg; / {{current.windspeed}} m/s
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -15,5 +27,23 @@ export default {
 }
 </script>
 
-<style lang="css">
+<style lang="css" scoped>
+.current-container {
+	display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.current {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.description {
+  padding: 2em;
+}
 </style>

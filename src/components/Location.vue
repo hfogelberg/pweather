@@ -29,4 +29,8 @@
     font-style: italic;
   }
 
+  .location-spinner {
+    text-align: center;
+    width: 100vw;
+  }
 </style>

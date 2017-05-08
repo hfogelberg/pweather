@@ -1,4 +1,6 @@
 
+@import 'colors';
+
 /* Android 2.3 :checked fix */
 @-webkit-keyframes fake {
   from {
@@ -22,8 +24,9 @@ body {
 }
 
 .tabs-container {
-  margin: 20px;
-  width: 80%;
+  margin-left: 10vw;
+  width: 80vw;
+  margin-right: 10vw;
 }
 
 .tabs-container .state {
@@ -50,11 +53,19 @@ body {
 }
 
 .tabs-container .flex-tabs .panel {
-  background-color: #fff;
+  background-color: $panel-background-color;
+  color: $panel-text-color;
+  font-size: 1.5em;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: 300;
   padding: 20px;
   min-height: 300px;
   display: none;
   width: 100%;
+  border-bottom-left-radius: 20px;
+  border-bottom-right-radius: 20px;
   -ms-flex-preferred-size: auto;
       flex-basis: auto;
 }
@@ -63,10 +74,21 @@ body {
   display: inline-block;
   padding: 10px;
   vertical-align: top;
-  background-color: #eee;
+  background-color: $background-color;
   cursor: hand;
   cursor: pointer;
-  border-left: 10px solid #ccc;
+  border: 1px solid $shadow-color;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  text-align: center;
+}
+
+.flex-tabs .tab {
+  background-color: $tabhead_color;
+  border-bottom: 1px solid #ccc;
+  font-size: 1.5em;
+  font-weight: 400;
+  color: $tab-label-color;
 }
 
 .tabs-container .tab:hover {
@@ -77,9 +99,11 @@ body {
 #tab-two:checked ~ .tabs #tab-two-label,
 #tab-three:checked ~ .tabs #tab-three-label,
 #tab-four:checked ~ .tabs #tab-four-label {
-  background-color: #fff;
+  background-color: $selected_tab_color;
+  color: $selected_tab_font;
+  font-size: 1.8em;
+  font-weight: 400;
   cursor: default;
-  border-left-color: #69be28;
 }
 
 #tab-one:checked ~ .tabs #tab-one-panel,
@@ -97,12 +121,16 @@ body {
             flex-direction: column;
   }
   .flex-tabs .tab {
-    background: #fff;
     border-bottom: 1px solid #ccc;
+    font-size: 1.5em;
+    color: $tab-label-color;
+    background-color: red;
   }
+
   .flex-tabs .tab:last-of-type {
     border-bottom: none;
   }
+
   .flex-tabs #tab-one-label {
     -webkit-box-ordinal-group: 2;
         -ms-flex-order: 1;

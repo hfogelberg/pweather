@@ -1,5 +1,7 @@
-// Desktop
+@import '../assets/styles/colors';
 
+
+// Desktop
 body {
   font-size: 1em;
   line-height: 1.375em;
@@ -7,20 +9,22 @@ body {
 
 h1 {
   text-align: center;
-  font-size: 4em;
-  line-height: 1.05em;
+  font-size: 6em !important;
+  // line-height: 3.05em;
   margin-bottom: 0.5em;
   font-weight: 400;
+  color: $h1-header-color;
 }
 
 h2 {
   text-align: center;
   font-size: 2.25em;
   line-height: 1.25em;
+  font-weight: 400;
+  color: $h2-header-color;
 }
 
 h3 {
-  text-align: center;
   font-size: 1.75em;
   line-height: 1.25em;
 }

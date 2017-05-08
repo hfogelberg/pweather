@@ -31,7 +31,7 @@
     </div>
 
     <div v-else>
-      <div>Fetching forecast ... </div>
+      <h3 class='forecasts-spinner-text' v-if="location.hasLocationName">Fetching forecast ... </h3>
     </div>
 
   </div>
@@ -255,4 +255,9 @@ li {
   border-radius: 2px solid black;
 }
 
+.forecasts-spinner-text {
+  text-align: center;
+  margin-top: 1em;
+
+}
 </style>
