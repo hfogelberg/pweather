@@ -1,7 +1,7 @@
 <template lang="html">
   <div class="summary">
     <img src="../assets/img/sun.svg">
-    <h3>{{summary.text}}</h3>
+    <div class='summary-text'>{{summary.text}}</div>
   </div>
 </template>
 
@@ -32,8 +32,10 @@ export default {
       flex: 0.4
     }
 
-    h3 {
-      flex: 0.6;
+    .summary-text {
+      padding-left: 1em;
+      font-size: 1.75em;
+      line-height: 1.25em;
     }
   }
 </style>

@@ -1,6 +1,6 @@
 <template lang="html">
   <div class="hour">
-    <h3 class="time">{{hour.time}}</h3>
+    <h4 class="time">{{hour.time}}</h4>
 
     <div class='container'>
       <div class="img-container">
@@ -13,9 +13,9 @@
       </div>
 
       <div class='right'>
-        <label>Humidity {{hour.humidity}} %</label>
-        <label>Precimitation {{hour.precip}} mm (probability {{hour.preciProb}} %)</label>
-        <label>Wind {{hour.windBearing }} &deg; {{hour.windspeed}} m/s</label>
+        <label>Humidity {{hour.humidity}} %</label><br>
+        <label>Precimitation {{hour.precip}} mm (probability {{hour.preciProb}} %)</label><br>
+        <label>Wind {{hour.windBearing }} &deg; {{hour.windspeed}} m/s</label><br>
       </div>
     </div>
   </div>
@@ -30,4 +30,9 @@ export default {
 <style lang="scss">
 @import '../assets/styles/fonts';
 @import '../assets/styles/panel-content';
+
+img {
+  height: 100px;
+  width: 100px;
+}
 </style>

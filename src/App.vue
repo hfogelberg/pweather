@@ -15,7 +15,7 @@ export default {
 @import '/assets/styles/master';
 
 #app {
-  margin-top: 20px;
+  margin-top: 1em;
 }
 
 

@@ -4,27 +4,28 @@
 
     <location :location="location"></location>
 
-    <div v-if="hasForecast">
-      <now :summary = "dailySummary"></now>
-    </div>
-
     <div class="tabs-container" v-if="hasForecast">
-      <input class="state" type="radio" title="tab-one" name="tabs-state" id="tab-one" checked />
-      <input class="state" type="radio" title="tab-two" name="tabs-state" id="tab-two" />
+      <input class="state" type="radio" title="tab-one" name="tabs-state" id="tab-one" />
+      <input class="state" type="radio" title="tab-two" name="tabs-state" id="tab-two" checked=""/>
       <input class="state" type="radio" title="tab-three" name="tabs-state" id="tab-three" />
+      <input class="state" type="radio" title="tab-four" name="tabs-state" id="tab-four" />
 
       <div class="tabs flex-tabs">
-        <label for="tab-one" id="tab-one-label" class="tab">Today</label>
-        <label for="tab-two" id="tab-two-label" class="tab">The next hours</label>
-        <label for="tab-three" id="tab-three-label" class="tab">The next days</label>
+        <label for="tab-one" id="tab-one-label" class="tab">Summary</label>
+        <label for="tab-two" id="tab-two-label" class="tab">Today</label>
+        <label for="tab-three" id="tab-three-label" class="tab">The next hours</label>
+        <label for="tab-four" id="tab-four-label" class="tab">The next days</label>
 
-        <div id="tab-one-panel" class="panel active">
+        <div id="tab-one-panel" class="panel">
+          <now :summary = "dailySummary"></now>
+        </div>
+        <div id="tab-two-panel" class="panel active">
           <current-weather :current="current"></current-weather>
         </div>
-        <div id="tab-two-panel" class="panel">
+        <div id="tab-three-panel" class="panel">
           <hour-forecast :hourlyForecasts = "hourlyForecasts"></hour-forecast>
         </div>
-        <div id="tab-three-panel" class="panel">
+        <div id="tab-four-panel" class="panel">
           <days-forecast :dailyForecasts = "dailyForecasts"></days-forecast>
         </div>
       </div>
@@ -241,9 +242,8 @@ export default {
 @import '../assets/styles/fonts';
 @import '../assets/styles/flexcordion';
 
-.weather-data {
-  margin-left: 40px;
-  margin-top: 20px;
+.weather {
+  padding-top: 1em;
 }
 
 ul {

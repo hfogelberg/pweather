@@ -1,6 +1,6 @@
 <template lang="html">
   <div class="day">
-      <h3>{{daily.date}}</h3>
+      <h4>{{daily.date}}</h4>
 
       <div class="container">
         <div class="img-container">
@@ -34,4 +34,8 @@ export default {
 <style lang="scss" scoped>
 @import '../assets/styles/fonts';
 @import '../assets/styles/panel-content';
+
+.right label {
+  font-size: 0.8em !important;
+}
 </style>
